@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: babi-reviewer
+    env: node
+    repo: <YOUR_GITHUB_REPO_URL>
+    branch: main
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+    autoDeploy: true
+    plan: free
