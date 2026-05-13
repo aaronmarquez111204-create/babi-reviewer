@@ -7,6 +7,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <title>Babi's Reviewer Elite</title>
 </head>
 
@@ -79,6 +80,17 @@
             <div id="stats-list-container" style="max-height: 100px; overflow-y: auto;"></div>
           </div>
 
+          <!-- Smart: Review Due Today -->
+          <div class="bento-tile tile-small" style="background: rgba(123, 44, 191, 0.05); border-color: rgba(123, 44, 191, 0.1);">
+            <div class="bento-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              Review Due Today
+            </div>
+            <div id="srs-container" style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.8rem;">
+              <div style="opacity:0.4; font-size:0.8rem; text-align:center; padding:1rem;">Your memory is fresh! Nothing due.</div>
+            </div>
+          </div>
+
           <!-- Concepts to Focus On -->
           <div class="bento-tile tile-small" style="background: rgba(255, 0, 127, 0.05); border-color: rgba(255, 0, 127, 0.1);">
             <div class="bento-title">
@@ -108,9 +120,18 @@
         </header>
 
         <div class="bento-tile tile-large tile-highlight-pink" id="start-screen" style="max-width: 800px; margin: 0 auto;">
-          <div class="input-group">
-            <label>Quiz Title</label>
-            <input type="text" id="ai-title" placeholder="e.g. Pediatrics Chap 1">
+          <div style="display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 1.5rem;">
+            <div class="input-group" style="flex: 1; margin-bottom: 0;">
+              <label>Quiz Title</label>
+              <input type="text" id="ai-title" placeholder="e.g. Pediatrics Chap 1">
+            </div>
+            <div style="margin-left: 1rem;">
+              <input type="file" id="pdf-upload" accept=".pdf" style="display: none;" onchange="handlePDFUpload(event)">
+              <button class="btn-secondary" onclick="document.getElementById('pdf-upload').click()" title="Upload PDF Note" style="padding: 0.8rem; border-radius: 12px; display: flex; align-items: center; gap: 0.5rem; border-color: var(--accent-pink); color: var(--accent-pink);">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="12" y1="18" x2="12" y2="12"/><polyline points="9 15 12 12 15 15"/></svg>
+                PDF
+              </button>
+            </div>
           </div>
           <div class="input-group">
             <label>Context / Notes</label>

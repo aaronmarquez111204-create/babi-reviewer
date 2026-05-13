@@ -171,6 +171,7 @@ function switchView(viewId) {
   // Trigger specific view logic
   if (viewId === 'dashboard') {
     updateBentoInsights();
+    updateSRS(); // NEW: Refresh due quizes
   }
 }
 
@@ -1452,9 +1453,78 @@ function updateChartData() {
   performanceChart.update();
 }
 
-// Initial Call to load chart
+/**
+ * MASTER: PDF Text Extraction
+ */
+async function handlePDFUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  showLoading("Reading PDF content...");
+  
+  try {
+    const reader = new FileReader();
+    reader.onload = async function() {
+      const typedarray = new Uint8Array(this.result);
+      const pdf = await pdfjsLib.getDocument(typedarray).promise;
+      let fullText = "";
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+      }
+
+      document.getElementById('ai-context').value = fullText.trim();
+      document.getElementById('ai-title').value = file.name.replace('.pdf', '');
+      hideLoading();
+    };
+    reader.readAsArrayBuffer(file);
+  } catch (err) {
+    console.error(err);
+    alert("Error reading PDF. Make sure it's not password protected.");
+    hideLoading();
+  }
+}
+
+/**
+ * MASTER: Spaced Repetition (SRS)
+ */
+function updateSRS() {
+  const container = document.getElementById('srs-container');
+  if (!container) return;
+
+  const history = JSON.parse(localStorage.getItem('babisStudyHistory') || '[]');
+  const now = Date.now();
+  const threeDays = 3 * 24 * 60 * 60 * 1000;
+  
+  // Find quizzes where score < 80% and last taken > 3 days ago
+  const due = history.filter(record => {
+    const isDue = (now - record.timestamp) > threeDays;
+    const isLow = (record.score / record.total) < 0.8;
+    return isDue && isLow;
+  }).slice(0, 3); // Top 3 suggestions
+
+  if (due.length === 0) {
+    container.innerHTML = '<div style="opacity:0.4; font-size:0.8rem; text-align:center; padding:1rem;">Your memory is fresh! Nothing due.</div>';
+    return;
+  }
+
+  container.innerHTML = due.map(record => `
+    <div class="score-row animate-fade" style="background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05);">
+      <div style="flex: 1;">
+        <div style="font-size: 0.85rem; font-weight: 600;">${record.title}</div>
+        <div style="font-size: 0.7rem; color: var(--accent-pink);">Score: ${Math.round((record.score / record.total) * 100)}%</div>
+      </div>
+      <button class="btn-secondary" style="font-size: 0.7rem; padding: 0.3rem 0.6rem;" onclick="switchView('library')">Review</button>
+    </div>
+  `).join('');
+}
+
+// Initial Call to load SRS
 window.addEventListener('DOMContentLoaded', () => {
   switchView('dashboard');
   checkSavedData();
+  updateSRS(); // Initial SRS check
   setTimeout(updateChartData, 1000);
 });
