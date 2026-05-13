@@ -4,6 +4,7 @@
 <head>
   <base target="_top">
   <link rel="stylesheet" href="style.css">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <title>Babi's Reviewer</title>
 </head>
 
@@ -68,6 +69,21 @@
           <button class="btn-secondary" onclick="explainContent()" title="Simplify This Text">Simplify</button>
         </div>
 
+        <!-- NCLEX Mode Toggle -->
+        <div style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 12px;">
+          <div style="display: flex; align-items: center; gap: 0.8rem;">
+            <div style="color: var(--accent-orange);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+            <div>
+              <div style="font-size: 0.85rem; font-weight: 600;">NCLEX Mode</div>
+              <div style="font-size: 0.7rem; color: var(--text-dim);">60s Timer & No Rationales</div>
+            </div>
+          </div>
+          <label class="switch">
+            <input type="checkbox" id="nclex-mode-toggle">
+            <span class="slider round"></span>
+          </label>
+        </div>
+
         <!-- Resume Last Session Button -->
         <div id="resume-session-container"
           style="display: none; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
@@ -119,6 +135,18 @@
         </div>
       </div>
 
+      <!-- Tile: AI Chat Assistant (Small) -->
+      <div class="bento-tile tile-small" style="background: linear-gradient(135deg, rgba(123, 44, 191, 0.05), rgba(255, 0, 127, 0.1));">
+        <div class="bento-title">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-pink);">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+          </svg>
+          Chat with Babi
+        </div>
+        <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 0.5rem;">Ask anything about your notes</div>
+        <button class="btn-secondary" style="width: 100%; margin-top: 1.5rem; border-color: var(--accent-pink); color: var(--accent-pink);" onclick="openChat()">Open Chat</button>
+      </div>
+
       <!-- Tile: Dictionary (Small) -->
       <div class="bento-tile tile-small tile-highlight-blue">
         <div class="bento-title">
@@ -152,9 +180,11 @@
           </div>
         </div>
         <div style="margin-bottom: 1rem;">
-          <div
-            style="font-size: 0.65rem; text-transform: uppercase; opacity: 0.5; margin-bottom: 0.5rem; letter-spacing: 0.05em;">
-            Recent Performance</div>
+          <div style="font-size: 0.65rem; text-transform: uppercase; opacity: 0.5; margin-bottom: 0.5rem; letter-spacing: 0.05em;">Performance Trends</div>
+          <div style="height: 100px; margin-bottom: 1rem;">
+            <canvas id="performanceChart"></canvas>
+          </div>
+          <div style="font-size: 0.65rem; text-transform: uppercase; opacity: 0.5; margin-bottom: 0.5rem; letter-spacing: 0.05em;">Recent Scores</div>
           <div id="stats-list-container" style="max-height: 100px; overflow-y: auto; padding-right: 5px;"></div>
         </div>
         <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
@@ -274,7 +304,15 @@
 
         <!-- Rationale Section -->
         <div id="rationale-container" class="simple-rationale-box">
-          <div class="simple-label">Rationale</div>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+            <div class="simple-label">Rationale</div>
+            <button class="audio-btn" onclick="speakRationale()" title="Listen to Rationale">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
+                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
+              </svg>
+            </button>
+          </div>
           <div id="rationale-text" class="simple-text"></div>
         </div>
 
@@ -363,6 +401,46 @@
       </div>
       <div style="margin-top: 2rem;">
         <button class="btn-primary" style="width: 100%;" onclick="closeExplanation()">Got it!</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Flashcard Modal -->
+  <div id="flashcard-modal" class="modal" style="display: none; z-index: 2000;">
+    <div class="modal-content" style="max-width: 500px; height: 600px; background: transparent; box-shadow: none; padding: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+      <div class="flashcard-container" id="flashcard-card" onclick="flipFlashcard()">
+        <div class="flashcard-inner">
+          <div class="flashcard-front">
+            <div id="fc-front-text" style="font-size: 1.2rem; font-weight: 700; text-align: center; padding: 2rem;"></div>
+          </div>
+          <div class="flashcard-back">
+            <div id="fc-back-text" style="font-size: 1rem; line-height: 1.6; text-align: center; padding: 2rem;"></div>
+          </div>
+        </div>
+      </div>
+      <div style="margin-top: 2rem; display: flex; gap: 1rem; width: 100%;">
+        <button class="btn-secondary" style="flex: 1;" onclick="prevFlashcard()">Previous</button>
+        <button class="btn-primary" style="flex: 1;" onclick="nextFlashcard()">Next</button>
+      </div>
+      <button class="btn-secondary" style="margin-top: 1rem; width: 100%; border: none; background: rgba(255,255,255,0.05);" onclick="closeFlashcards()">Exit Flashcards</button>
+    </div>
+  </div>
+
+  <!-- AI Chat Modal -->
+  <div id="chat-modal" class="modal" style="display: none; z-index: 2100;">
+    <div class="modal-content" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+        <h2 style="margin: 0; font-size: 1.2rem; color: var(--accent-pink);">Chat with Babi</h2>
+        <button onclick="closeChat()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;">✕</button>
+      </div>
+      <div id="chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding-right: 10px; margin-bottom: 1rem;">
+        <div style="background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border-radius: 15px 15px 15px 0; align-self: flex-start; max-width: 80%; font-size: 0.9rem;">
+          Hello! I'm Babi. Ask me anything about your nursing notes or pathophysiology!
+        </div>
+      </div>
+      <div style="display: flex; gap: 0.8rem;">
+        <input type="text" id="chat-input" placeholder="Type your question..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 1.2rem; border-radius: 50px;" onkeypress="if(event.key==='Enter') sendChatMessage()">
+        <button class="btn-primary" style="border-radius: 50px; padding: 0 1.5rem;" onclick="sendChatMessage()">Send</button>
       </div>
     </div>
   </div>

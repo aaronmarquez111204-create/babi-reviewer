@@ -17,6 +17,9 @@ let currentQuizTitle = "AI Assistant Quiz";
 let currentFlashcardIndex = 0;
 let currentFlashcardContent = ""; // Temp storage for flashcard summary
 let loadingTimerInterval = null;  // Elapsed seconds for the loading bar
+let performanceChart = null;      // Chart.js instance
+let currentFlashcardSet = [];    // Data for the active flashcard session
+let isNCLEXMode = false;         // Global toggle for strict testing
 
 /** Show & start the fill loading bar + elapsed timer */
 function showLoading(statusText) {
@@ -128,6 +131,20 @@ function checkApiKeyStatus() {
       if (!hasKey) setTimeout(toggleSettings, 1000);
     }).getHasApiKey();
   }
+}
+
+/**
+ * NEW: Audio Review (Text-to-Speech)
+ */
+function speakText(text) {
+  if (!text) return;
+  // Stop any current speaking
+  window.speechSynthesis.cancel();
+
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.rate = 0.9; // Slightly slower for clarity
+  utterance.pitch = 1;
+  window.speechSynthesis.speak(utterance);
 }
 
 function saveSettings() {
@@ -368,6 +385,15 @@ function startLibraryQuiz(id) {
   document.getElementById('max-score').textContent = questions.length;
   currentIndex = 0;
   score = 0;
+
+  // Check NCLEX Mode
+  isNCLEXMode = document.getElementById('nclex-mode-toggle').checked;
+  if (isNCLEXMode) {
+    timeLeft = 60; // NCLEX allows roughly 60s per question
+  } else {
+    timeLeft = 30;
+  }
+
   loadQuestion();
   startTimer();
 }
@@ -495,6 +521,8 @@ function updateBentoInsights() {
     listCont.innerHTML = '<div style="opacity:0.5; font-size:0.8rem; text-align:center; padding:1rem;">Finish a quiz to see your insights.</div>';
     return;
   }
+  
+  updateChartData(); // NEW: Refresh the trends chart
 
   // Render Recent Scores (Last 3)
   const recent = [...studyHistory].slice(-3).reverse();
@@ -739,7 +767,7 @@ function loadQuestion() {
   document.getElementById('feedback-modal').style.display = 'none';
 
   // Navigation Buttons Logic
-  document.getElementById('prev-btn').disabled = (currentIndex === 0);
+  document.getElementById('prev-btn').disabled = (currentIndex === 0 || isNCLEXMode); // NCLEX doesn't allow going back
   document.getElementById('next-quiz-btn').textContent = (currentIndex === questions.length - 1) ? "Finish Quiz" : "Skip / Next";
 
   // Update count and progress
@@ -808,7 +836,18 @@ function handleSubmit() {
   }
 
   saveActiveSession();
-  showModal(isCorrect, q.options[q.answer], q.rationale);
+  
+  // NCLEX Logic: Hide rationale until end if mode is active
+  if (isNCLEXMode) {
+    advanceQuestion(); // Auto-advance in NCLEX mode
+  } else {
+    showModal(isCorrect, q.options[q.answer], q.rationale);
+  }
+}
+
+function speakRationale() {
+  const text = document.getElementById('rationale-text').textContent;
+  speakText(text);
 }
 
 function showModal(isCorrect, correctAnswerText, rationale) {
@@ -1276,3 +1315,112 @@ function prevCard() {
     renderCurrentFlashcard();
   }
 }
+
+/**
+ * NEW: AI Chat Logic
+ */
+function openChat() {
+  document.getElementById('chat-modal').style.display = 'flex';
+}
+
+function closeChat() {
+  document.getElementById('chat-modal').style.display = 'none';
+}
+
+async function sendChatMessage() {
+  const input = document.getElementById('chat-input');
+  const text = input.value.trim();
+  if (!text) return;
+
+  const messagesCont = document.getElementById('chat-messages');
+  
+  // User Message
+  const userMsg = document.createElement('div');
+  userMsg.style = "background: var(--accent-pink); color: white; padding: 0.8rem 1rem; border-radius: 15px 15px 0 15px; align-self: flex-end; max-width: 80%; font-size: 0.9rem;";
+  userMsg.textContent = text;
+  messagesCont.appendChild(userMsg);
+  
+  input.value = '';
+  messagesCont.scrollTop = messagesCont.scrollHeight;
+
+  // AI Typing...
+  const typingMsg = document.createElement('div');
+  typingMsg.style = "background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border-radius: 15px 15px 15px 0; align-self: flex-start; max-width: 80%; font-size: 0.9rem; opacity: 0.6;";
+  typingMsg.textContent = "Babi is thinking...";
+  messagesCont.appendChild(typingMsg);
+
+  try {
+    const context = document.getElementById('ai-context').value;
+    const response = await callBackend('testAiConnection', { 
+      selectedModel: 'gemini-1.5-flash',
+      prompt: `User says: ${text}\n\nContext from notes: ${context}\n\nReply as a helpful nursing tutor.`
+    });
+    
+    typingMsg.remove();
+    const aiMsg = document.createElement('div');
+    aiMsg.style = "background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border-radius: 15px 15px 15px 0; align-self: flex-start; max-width: 80%; font-size: 0.9rem;";
+    aiMsg.textContent = response.replace(/^Success: /, '');
+    messagesCont.appendChild(aiMsg);
+  } catch (err) {
+    typingMsg.textContent = "Error: " + err.message;
+  }
+  
+  messagesCont.scrollTop = messagesCont.scrollHeight;
+}
+
+/**
+ * NEW: Performance Charting
+ */
+function initPerformanceChart() {
+  const ctx = document.getElementById('performanceChart');
+  if (!ctx || performanceChart) return;
+
+  performanceChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Score %',
+        data: [],
+        borderColor: '#ff9e00',
+        backgroundColor: 'rgba(255, 158, 0, 0.1)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 4,
+        pointBackgroundColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { display: false },
+        y: { 
+          beginAtZero: true, 
+          max: 100,
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 } }
+        }
+      }
+    }
+  });
+}
+
+function updateChartData() {
+  if (!performanceChart) initPerformanceChart();
+  if (!performanceChart) return;
+
+  const history = JSON.parse(localStorage.getItem('studyHistory') || '[]');
+  const scores = history.slice(-10).map(h => (h.score / h.total) * 100);
+  const labels = history.slice(-10).map(h => h.date);
+
+  performanceChart.data.labels = labels;
+  performanceChart.data.datasets[0].data = scores;
+  performanceChart.update();
+}
+
+// Initial Call to load chart
+window.addEventListener('DOMContentLoaded', () => {
+  setTimeout(updateChartData, 1000);
+});
