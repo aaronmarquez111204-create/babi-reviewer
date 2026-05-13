@@ -20,6 +20,7 @@ let loadingTimerInterval = null;  // Elapsed seconds for the loading bar
 let performanceChart = null;      // Chart.js instance
 let currentFlashcardSet = [];    // Data for the active flashcard session
 let isNCLEXMode = false;         // Global toggle for strict testing
+let currentView = 'dashboard';   // Track active sidebar view
 
 /** Show & start the fill loading bar + elapsed timer */
 function showLoading(statusText) {
@@ -145,6 +146,32 @@ function speakText(text) {
   utterance.rate = 0.9; // Slightly slower for clarity
   utterance.pitch = 1;
   window.speechSynthesis.speak(utterance);
+}
+
+/**
+ * Sidebar Navigation: Switch between different sections
+ */
+function switchView(viewId) {
+  currentView = viewId;
+  
+  // Update Nav Active State
+  const navItems = document.querySelectorAll('.nav-item');
+  navItems.forEach(item => item.classList.remove('active'));
+  
+  const activeNav = document.getElementById(`nav-${viewId}`);
+  if (activeNav) activeNav.classList.add('active');
+  
+  // Update View Visibility
+  const views = document.querySelectorAll('.view-section');
+  views.forEach(view => view.classList.remove('active'));
+  
+  const targetView = document.getElementById(`view-${viewId}`);
+  if (targetView) targetView.classList.add('active');
+
+  // Trigger specific view logic
+  if (viewId === 'dashboard') {
+    updateBentoInsights();
+  }
 }
 
 function saveSettings() {
@@ -400,8 +427,13 @@ function startLibraryQuiz(id) {
 
 function goHome() {
   document.getElementById('result-screen').style.display = 'none';
-  document.getElementById('start-screen').style.display = 'block';
+  document.getElementById('quiz-screen').style.display = 'none';
+  switchView('dashboard');
   checkSavedData();
+}
+
+function showDashboard() {
+  goHome();
 }
 
 function checkSavedData() {
@@ -1422,5 +1454,7 @@ function updateChartData() {
 
 // Initial Call to load chart
 window.addEventListener('DOMContentLoaded', () => {
+  switchView('dashboard');
+  checkSavedData();
   setTimeout(updateChartData, 1000);
 });

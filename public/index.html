@@ -1,452 +1,319 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 
 <head>
   <base target="_top">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="style.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <title>Babi's Reviewer</title>
+  <title>Babi's Reviewer Elite</title>
 </head>
 
-<body class="bg-dark text-white">
+<body>
   <!-- Animated Background Blobs -->
   <div class="blob blob-1"></div>
   <div class="blob blob-2"></div>
 
-  <div class="container animate-fade">
-    <div class="bento-grid">
-      <!-- Dashboard Header Tile -->
-      <div class="bento-tile tile-wide"
-        style="grid-column: span 4; display: flex; justify-content: space-between; align-items: center; background: transparent; box-shadow: none; border: none; padding: 1rem 0;">
-        <div>
-          <h1
-            style="font-size: 2.2rem; margin: 0; background: linear-gradient(90deg, #fff, #aaa); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;">
-            Babi's Reviewer</h1>
-          <p style="color: var(--text-dim); font-size: 0.9rem;">Elevating Nursing Education</p>
+  <div class="app-shell">
+    <!-- SIDEBAR NAVIGATION -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <div style="background: linear-gradient(135deg, var(--accent-pink), var(--accent-purple)); width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="3"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
         </div>
-        <button class="btn-secondary" onclick="toggleSettings()"
-          style="border-radius: 50%; width: 50px; height: 50px; padding: 0;">
-          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round">
-            <path
-              d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z" />
-            <circle cx="12" cy="12" r="3" />
-          </svg>
-        </button>
+        Babi Elite
       </div>
 
-      <!-- Tile: AI Quiz Generator -->
-      <div class="bento-tile tile-large tile-highlight-pink" id="start-screen">
-        <div class="bento-title">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-pink);">
-            <path
-              d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z" />
-            <path d="M5 3v4" />
-            <path d="M3 5h4" />
-            <path d="M21 17v4" />
-            <path d="M19 19h4" />
-          </svg>
-          Quiz Generator
+      <nav class="nav-list">
+        <div class="nav-item active" id="nav-dashboard" onclick="switchView('dashboard')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+          Dashboard
         </div>
-        <span class="bento-subtitle">Create custom nursing practice sets from your notes.</span>
-
-        <div class="input-group">
-          <label>Quiz Title</label>
-          <input type="text" id="ai-title" placeholder="e.g. Pediatrics Chap 1">
+        <div class="nav-item" id="nav-lab" onclick="switchView('lab')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m12 3-1.912 5.813a2 2 0 0 1-1.275 1.275L3 12l5.813 1.912a2 2 0 0 1 1.275 1.275L12 21l1.912-5.813a2 2 0 0 1 1.275-1.275L21 12l-5.813-1.912a2 2 0 0 1-1.275-1.275L12 3Z"/></svg>
+          AI Lab
         </div>
-
-        <div class="input-group">
-          <label>Context / Notes</label>
-          <textarea id="ai-context" placeholder="Paste your reviewer text here..." style="height: 180px;"></textarea>
+        <div class="nav-item" id="nav-library" onclick="switchView('library')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>
+          Library
         </div>
+        <div class="nav-item" id="nav-tutor" onclick="switchView('tutor')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          AI Tutor
+        </div>
+        <div class="nav-item" id="nav-dictionary" onclick="switchView('dictionary')">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          Dictionary
+        </div>
+      </nav>
 
-        <div class="ai-controls">
-          <div class="input-group">
-            <input type="number" id="ai-count" value="10" min="1" max="50">
+      <div style="margin-top: auto; padding-top: 2rem; border-top: 1px solid var(--glass-border);">
+        <div class="nav-item" onclick="toggleSettings()">
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2 2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 .33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          Settings
+        </div>
+      </div>
+    </aside>
+
+    <!-- MAIN CONTENT AREA -->
+    <main class="main-content">
+      
+      <!-- VIEW: DASHBOARD -->
+      <section id="view-dashboard" class="view-section active">
+        <header style="margin-bottom: 2.5rem;">
+          <h1 style="font-size: 2rem; margin: 0;">Welcome back, Nurse!</h1>
+          <p style="color: var(--text-dim);">Here is your study overview for today.</p>
+        </header>
+
+        <div class="bento-grid">
+          <!-- Growth Insights -->
+          <div class="bento-tile tile-large" style="background: linear-gradient(135deg, rgba(255, 158, 0, 0.05), rgba(0, 180, 216, 0.1)); min-height: 350px;">
+            <div class="bento-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 20V10"/><path d="M18 20V4"/><path d="M6 20v-4"/></svg>
+              Performance Trends
+            </div>
+            <div style="height: 200px; margin: 1.5rem 0;">
+              <canvas id="performanceChart"></canvas>
+            </div>
+            <div id="stats-list-container" style="max-height: 100px; overflow-y: auto;"></div>
           </div>
-          <button class="btn-primary" style="flex: 1;" onclick="generateAIQuiz()">Generate</button>
-          <button class="btn-secondary" onclick="explainContent()" title="Simplify This Text">Simplify</button>
-        </div>
 
-        <!-- NCLEX Mode Toggle -->
-        <div style="margin-top: 1rem; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 12px;">
-          <div style="display: flex; align-items: center; gap: 0.8rem;">
-            <div style="color: var(--accent-orange);"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
-            <div>
-              <div style="font-size: 0.85rem; font-weight: 600;">NCLEX Mode</div>
-              <div style="font-size: 0.7rem; color: var(--text-dim);">60s Timer & No Rationales</div>
+          <!-- Concepts to Focus On -->
+          <div class="bento-tile tile-small" style="background: rgba(255, 0, 127, 0.05); border-color: rgba(255, 0, 127, 0.1);">
+            <div class="bento-title">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m21 2-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0 3 3L22 7l-3-3-3.5 3.5z"/></svg>
+              Weak Areas
+            </div>
+            <div id="weak-areas-container" style="margin-top: 1.5rem;">
+              <div style="opacity:0.4; font-size:0.8rem; text-align:center; padding:1rem;">Finish a quiz to track concepts.</div>
             </div>
           </div>
-          <label class="switch">
-            <input type="checkbox" id="nclex-mode-toggle">
-            <span class="slider round"></span>
-          </label>
-        </div>
 
-        <!-- Resume Last Session Button -->
-        <div id="resume-session-container"
-          style="display: none; margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.05);">
-          <button class="btn-secondary"
-            style="width: 100%; background: rgba(0, 180, 216, 0.1); border-color: rgba(0, 180, 216, 0.3);"
-            onclick="resumeLastQuiz()">
-            🕒 Resume Session: <span id="saved-quiz-title" style="font-weight: 600;"></span>
-          </button>
-        </div>
-      </div>
-
-      <!-- Tile: Library (Wide) -->
-      <div class="bento-tile tile-wide">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-          <div class="bento-title">
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
-              <path d="M12 2v8" />
-              <path d="m4.93 4.93 1.41 1.41" />
-              <path d="M2 12h8" />
-              <path d="m4.93 19.07 1.41-1.41" />
-              <path d="M12 22v-8" />
-              <path d="m19.07 19.07-1.41-1.41" />
-              <path d="M22 12h-8" />
-              <path d="m19.07 4.93-1.41 1.41" />
-            </svg>
-            My Library
+          <!-- Active Session CTA -->
+          <div id="resume-session-container" class="bento-tile tile-small" style="display: none; background: rgba(0, 180, 216, 0.1); border-color: rgba(0, 180, 216, 0.2); cursor: pointer;" onclick="resumeLastQuiz()">
+            <div class="bento-title" style="color: var(--accent-blue);">
+              Resume Session
+            </div>
+            <p style="font-size: 0.85rem; margin-top: 1rem;">Pick up where you left off in: <br><strong id="saved-quiz-title"></strong></p>
           </div>
-          <div class="library-tabs">
+        </div>
+      </section>
+
+      <!-- VIEW: AI LAB (Generator) -->
+      <section id="view-lab" class="view-section">
+        <header style="margin-bottom: 2.5rem;">
+          <h1 style="font-size: 2rem; margin: 0;">AI Quiz Lab</h1>
+          <p style="color: var(--text-dim);">Generate personalized quizes and study guides.</p>
+        </header>
+
+        <div class="bento-tile tile-large tile-highlight-pink" id="start-screen" style="max-width: 800px; margin: 0 auto;">
+          <div class="input-group">
+            <label>Quiz Title</label>
+            <input type="text" id="ai-title" placeholder="e.g. Pediatrics Chap 1">
+          </div>
+          <div class="input-group">
+            <label>Context / Notes</label>
+            <textarea id="ai-context" placeholder="Paste your reviewer text here..." style="height: 250px;"></textarea>
+          </div>
+          <div class="ai-controls">
+            <div class="input-group">
+              <input type="number" id="ai-count" value="10" min="1" max="50">
+            </div>
+            <button class="btn-primary" style="flex: 1;" onclick="generateAIQuiz()">Generate Quiz</button>
+            <button class="btn-secondary" onclick="explainContent()">Create Study Guide</button>
+          </div>
+          <!-- NCLEX Toggle -->
+          <div style="margin-top: 1.5rem; display: flex; align-items: center; justify-content: space-between; background: rgba(255,255,255,0.03); padding: 1rem; border-radius: 16px;">
+            <div style="display: flex; align-items: center; gap: 0.8rem;">
+              <div style="color: var(--accent-orange);"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg></div>
+              <div>
+                <div style="font-size: 0.9rem; font-weight: 600;">NCLEX Simulation Mode</div>
+                <div style="font-size: 0.75rem; color: var(--text-dim);">Strict 60s timer & hidden rationales</div>
+              </div>
+            </div>
+            <label class="switch">
+              <input type="checkbox" id="nclex-mode-toggle">
+              <span class="slider round"></span>
+            </label>
+          </div>
+        </div>
+      </section>
+
+      <!-- VIEW: LIBRARY -->
+      <section id="view-library" class="view-section">
+        <header style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2.5rem;">
+          <div>
+            <h1 style="font-size: 2rem; margin: 0;">My Library</h1>
+            <p style="color: var(--text-dim);">Manage your saved study materials.</p>
+          </div>
+          <div class="library-tabs" style="background: rgba(255,255,255,0.05); padding: 0.4rem; border-radius: 12px;">
             <button class="tab-btn active" id="tab-quizzes" onclick="switchLibraryTab('quizzes')">Quizzes</button>
-            <button class="tab-btn" id="tab-guides" onclick="switchLibraryTab('guides')">Guides</button>
+            <button class="tab-btn" id="tab-guides" onclick="switchLibraryTab('guides')">Study Guides</button>
           </div>
-        </div>
+        </header>
 
-        <div id="library-container" class="quiz-library-grid" style="max-height: 160px; overflow-y: auto;">
+        <div id="library-container" class="quiz-library-grid">
           <!-- Dynamic Quizzes -->
         </div>
-        <div id="guides-container" class="quiz-library-grid"
-          style="display: none; max-height: 160px; overflow-y: auto;">
+        <div id="guides-container" class="quiz-library-grid" style="display: none;">
           <!-- Dynamic Guides -->
         </div>
 
-        <div id="flashcard-study-cta"
-          style="display:none; margin-top: 1rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
-          <button class="btn-primary" onclick="startFlashcards()"
-            style="font-size: 0.8rem; padding: 0.6rem 1.2rem; border-radius: 50px; background: linear-gradient(135deg, var(--accent-purple), #9d4edd);">
-            Start Terminal Flip-Cards
+        <div id="flashcard-study-cta" style="display:none; margin-top: 2rem; text-align: center;">
+          <button class="btn-primary" onclick="startFlashcards()" style="padding: 1rem 2rem; border-radius: 50px; background: linear-gradient(135deg, var(--accent-purple), #9d4edd);">
+            🚀 Start Study Flashcards
           </button>
         </div>
-      </div>
+      </section>
 
-      <!-- Tile: AI Chat Assistant (Small) -->
-      <div class="bento-tile tile-small" style="background: linear-gradient(135deg, rgba(123, 44, 191, 0.05), rgba(255, 0, 127, 0.1));">
-        <div class="bento-title">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-pink);">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-          </svg>
-          Chat with Babi
-        </div>
-        <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: 0.5rem;">Ask anything about your notes</div>
-        <button class="btn-secondary" style="width: 100%; margin-top: 1.5rem; border-color: var(--accent-pink); color: var(--accent-pink);" onclick="openChat()">Open Chat</button>
-      </div>
-
-      <!-- Tile: Dictionary (Small) -->
-      <div class="bento-tile tile-small tile-highlight-blue">
-        <div class="bento-title">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-            stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-blue);">
-            <path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0.5-5" />
-            <path d="M4 19.5h16" />
-            <path d="M6 2v17.5" />
-          </svg>
-          Dictionary
-        </div>
-        <div class="input-group" style="margin-top: 1rem;">
-          <input type="text" id="word-input" placeholder="Define medical term...">
-        </div>
-        <button class="btn-secondary" style="width: 100%; margin-top: 1rem;" onclick="explainWord()">Define</button>
-      </div>
-
-      <!-- Tile: Study Insights (Small) -->
-      <div class="bento-tile tile-small"
-        style="background: linear-gradient(135deg, rgba(255, 158, 0, 0.05), rgba(0, 180, 216, 0.1)); min-height: 200px;">
-        <div class="insights-header"
-          style="display:flex; justify-content:space-between; align-items:center; margin-bottom:1rem;">
-          <div class="bento-title" style="margin:0;">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round" style="color: var(--accent-orange);">
-              <path d="M12 20V10" />
-              <path d="M18 20V4" />
-              <path d="M6 20v-4" />
-            </svg>
-            Insights
+      <!-- VIEW: AI TUTOR -->
+      <section id="view-tutor" class="view-section">
+        <div class="bento-tile" style="height: calc(100vh - 120px); display: flex; flex-direction: column;">
+          <div class="bento-title" style="color: var(--accent-pink); margin-bottom: 1.5rem;">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+            Ask Babi Anything
+          </div>
+          <div id="chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding-right: 15px; margin-bottom: 1.5rem;">
+            <div style="background: rgba(255,255,255,0.05); padding: 1rem; border-radius: 18px 18px 18px 0; align-self: flex-start; max-width: 80%; font-size: 0.95rem; line-height: 1.5;">
+              Hello! I'm your nursing tutor. You can ask me to explain concepts, clarify terms, or summarize the text you've pasted in the Lab.
+            </div>
+          </div>
+          <div style="display: flex; gap: 1rem;">
+            <input type="text" id="chat-input" placeholder="Type a message..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 1rem 1.5rem; border-radius: 50px;" onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button class="btn-primary" style="border-radius: 50px; padding: 0 2rem;" onclick="sendChatMessage()">Send</button>
           </div>
         </div>
-        <div style="margin-bottom: 1rem;">
-          <div style="font-size: 0.65rem; text-transform: uppercase; opacity: 0.5; margin-bottom: 0.5rem; letter-spacing: 0.05em;">Performance Trends</div>
-          <div style="height: 100px; margin-bottom: 1rem;">
-            <canvas id="performanceChart"></canvas>
+      </section>
+
+      <!-- VIEW: DICTIONARY -->
+      <section id="view-dictionary" class="view-section">
+        <header style="margin-bottom: 2.5rem;">
+          <h1 style="font-size: 2rem; margin: 0;">Medical Dictionary</h1>
+          <p style="color: var(--text-dim);">Instant definitions for complex nursing terminology.</p>
+        </header>
+
+        <div class="bento-tile tile-large tile-highlight-blue" style="max-width: 600px; margin: 0 auto; text-align: center;">
+          <div class="input-group" style="margin: 2rem 0;">
+            <input type="text" id="word-input" placeholder="e.g. Myocardial Infarction" style="text-align: center; font-size: 1.2rem; padding: 1.2rem;">
           </div>
-          <div style="font-size: 0.65rem; text-transform: uppercase; opacity: 0.5; margin-bottom: 0.5rem; letter-spacing: 0.05em;">Recent Scores</div>
-          <div id="stats-list-container" style="max-height: 100px; overflow-y: auto; padding-right: 5px;"></div>
+          <button class="btn-primary" style="width: 100%;" onclick="explainWord()">Define Term</button>
         </div>
-        <div style="border-top: 1px solid rgba(255,255,255,0.05); padding-top: 1rem;">
-          <div
-            style="font-size: 0.65rem; text-transform: uppercase; opacity: 0.5; margin-bottom: 0.5rem; letter-spacing: 0.05em;">
-            Concepts to Focus On</div>
-          <div id="weak-areas-container">
-            <div style="opacity:0.4; font-size:0.7rem; text-align:center; padding:0.5rem;">No missed concepts tracked
-              yet.</div>
-          </div>
-        </div>
-      </div>
-    </div><!-- End bento-grid -->
+      </section>
 
-    <!-- Settings Modal -->
-    <div id="settings-modal" class="modal-overlay" style="display: none;">
-      <div class="modal-content glass" style="max-width: 400px;">
-        <h2>Settings</h2>
-        <div class="input-group" style="text-align: left; margin-bottom: 1rem;">
-          <label>Gemini API Key</label>
-          <input type="password" id="api-key-input" placeholder="Paste your key here...">
-          <p style="font-size: 0.7rem; opacity: 0.5; margin-top: 0.5rem;">Get a key at <a
-              href="https://aistudio.google.com/" target="_blank" style="color: var(--primary);">Google AI Studio</a>
-          </p>
-        </div>
-        <div class="input-group" style="text-align: left;">
-          <label>AI Model Selection</label>
-          <div style="display: flex; gap: 0.5rem;">
-            <select id="model-select" style="flex: 1;">
-              <option value="gemini-1.5-flash">Gemini 1.5 Flash (Fastest)</option>
-              <option value="gemini-1.5-pro">Gemini 1.5 Pro (Brainiest)</option>
-            </select>
-            <button class="btn-secondary" style="padding: 0 1rem; font-size: 0.7rem;"
-              onclick="scanModels(this)">Scan</button>
-          </div>
-          <p id="scan-status" style="font-size: 0.6rem; opacity: 0.5; margin-top: 0.3rem;">Scan to find available models
-            for your account.</p>
-        </div>
-        <button class="btn-secondary" style="width: 100%; margin-top: 1rem; font-size: 0.8rem;"
-          onclick="runDiagnosticTest()">🧪 Test AI Connection</button>
-        <div style="display: flex; gap: 1rem; margin-top: 1.5rem;">
-          <button class="btn-secondary" style="flex: 1;" onclick="toggleSettings()">Cancel</button>
-          <button class="btn-primary" style="flex: 1;" onclick="saveSettings()">Save</button>
-        </div>
-      </div>
-    </div>
+    </main>
+  </div>
 
-    <!-- Loading Overlay -->
-    <div id="loading-overlay" class="modal-overlay" style="display: none;">
-      <div style="text-align: center; width: 100%; max-width: 420px;">
-        <h2 style="color: white; font-weight: 400; letter-spacing: 0.1em; font-size: 0.9rem;">BABI'S AI IS THINKING...
-        </h2>
-        <p id="loading-status"
-          style="color: rgba(255,255,255,0.6); margin-top: 0.8rem; font-style: italic; font-size: 0.8rem;">Brewing
-          complex nursing knowledge...</p>
-
-        <!-- Fill Progress Bar -->
-        <div
-          style="margin-top: 2rem; background: rgba(255,255,255,0.08); border-radius: 100px; height: 8px; overflow: hidden; width: 100%;">
-          <div id="loading-fill-bar"
-            style="height: 100%; width: 0%; border-radius: 100px; background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue)); transition: width 0.4s ease; box-shadow: 0 0 12px rgba(123,44,191,0.5);">
-          </div>
-        </div>
-
-        <!-- Elapsed Time -->
-        <p id="loading-timer"
-          style="margin-top: 0.8rem; font-size: 0.72rem; color: rgba(255,255,255,0.3); letter-spacing: 0.05em;">0s
-          elapsed</p>
-      </div>
-    </div>
-
-    <!-- Quiz Screen -->
-    <div id="quiz-screen" class="quiz-card animate-fade" style="display: none;">
+  <!-- QUIZ SCREEN (OVERLAY) -->
+  <div id="quiz-screen" class="quiz-card animate-fade" style="display: none; position: fixed; inset: 0; z-index: 1000; border-radius: 0; width: 100vw; height: 100vh;">
+    <div style="max-width: 800px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; padding: 2rem;">
       <div class="quiz-header">
         <div style="display:flex; align-items:center; gap:1rem;">
-          <button class="btn-secondary" onclick="quitQuiz()"
-            style="padding: 0.4rem 0.8rem; font-size: 0.75rem; border-radius: 8px;">Quit</button>
-          <div class="question-number">Question <span id="current-count">1</span> of <span id="total-count">0</span>
-          </div>
+          <button class="btn-secondary" onclick="quitQuiz()" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Quit</button>
+          <div class="question-number">Question <span id="current-count">1</span> of <span id="total-count">0</span></div>
         </div>
         <div class="timer-box">
-          <svg class="timer-icon" viewBox="0 0 24 24">
-            <path
-              d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" />
-          </svg>
+          <svg class="timer-icon" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm.5-13H11v6l5.25 3.15.75-1.23-4.5-2.67z" /></svg>
           <span class="timer-text" id="timer">0:30</span>
         </div>
       </div>
-
-      <div class="progress-container">
-        <div class="progress-bar" id="progress"></div>
-      </div>
-
-      <div id="question-container">
-        <div class="question-text" id="question">Loading question...</div>
+      <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
+      <div id="question-container" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+        <div class="question-text" id="question">Loading...</div>
         <div class="options-grid" id="options"></div>
       </div>
-
       <div class="quiz-footer" style="display: flex; gap: 1rem;">
         <button class="btn-secondary" id="prev-btn" onclick="goPrevious()" style="flex: 1;">Previous</button>
-        <button class="btn-primary" id="submit-btn" onclick="handleSubmit()" disabled style="flex: 2;">Submit
-          Answer</button>
+        <button class="btn-primary" id="submit-btn" onclick="handleSubmit()" disabled style="flex: 2;">Submit Answer</button>
         <button class="btn-secondary" id="next-quiz-btn" onclick="goNext()" style="flex: 1;">Skip / Next</button>
       </div>
     </div>
+  </div>
 
-    <!-- Feedback Modal -->
-    <div id="feedback-modal" class="modal-overlay" style="display: none;">
-      <div class="modal-content animate-fade">
-        <div id="feedback-icon-container"></div>
-        <h2 id="feedback-status" style="margin-bottom: 0.5rem;">Result</h2>
-        <p id="feedback-msg" style="color: var(--text-muted); margin-bottom: 1.5rem;"></p>
-        <div id="correct-answer-box" class="simple-answer-box" style="display: none;">
-          <div class="simple-label">Correct Answer</div>
-          <div id="correct-answer-text" class="simple-text"></div>
-        </div>
-
-        <!-- Rationale Section -->
-        <div id="rationale-container" class="simple-rationale-box">
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
-            <div class="simple-label">Rationale</div>
-            <button class="audio-btn" onclick="speakRationale()" title="Listen to Rationale">
-              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M11 5L6 9H2v6h4l5 4V5z"></path>
-                <path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"></path>
-              </svg>
-            </button>
-          </div>
-          <div id="rationale-text" class="simple-text"></div>
-        </div>
-
-        <button id="next-btn" class="btn-primary" style="width: 100%;" onclick="advanceQuestion()">Next
-          Question</button>
+  <!-- Feedback Modal -->
+  <div id="feedback-modal" class="modal-overlay" style="display: none; z-index: 2000;">
+    <div class="modal-content animate-fade">
+      <div id="feedback-icon-container"></div>
+      <h2 id="feedback-status" style="margin-bottom: 0.5rem;">Result</h2>
+      <p id="feedback-msg" style="color: var(--text-dim); margin-bottom: 1.5rem;"></p>
+      <div id="correct-answer-box" class="simple-answer-box" style="display: none;">
+        <div class="simple-label">Correct Answer</div>
+        <div id="correct-answer-text" class="simple-text"></div>
       </div>
-    </div>
-
-    <!-- Flashcard Modal -->
-    <div id="flashcard-modal" class="flashcard-modal">
-      <button class="close-btn" onclick="closeFlashcards()"
-        style="position: absolute; top: 2rem; right: 2rem; background: rgba(255,255,255,0.1); border: none; color: white; width: 44px; height: 44px; border-radius: 50%; cursor: pointer;">✕</button>
-
-      <div style="text-align: center;">
-        <div id="card-counter"
-          style="color: var(--text-dim); margin-bottom: 2rem; font-size: 0.9rem; font-weight: 500;">Card 1 of 10</div>
-
-        <div class="flashcard-container" onclick="this.classList.toggle('flipped')">
-          <div class="flashcard-inner">
-            <div class="flashcard-face">
-              <div
-                style="color: var(--primary); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.5rem;">
-                QUESTION</div>
-              <div id="card-front-text" style="font-size: 1rem; line-height: 1.6; overflow-y: auto; max-height: 100%;">
-                Detailed explanation goes here.</div>
-              <div style="margin-top: 2rem; opacity: 0.4; font-size: 0.8rem;">Click to reveal term</div>
-            </div>
-            <div class="flashcard-face flashcard-back">
-              <div
-                style="color: var(--accent-purple); font-size: 0.75rem; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 1.5rem;">
-                ANSWER</div>
-              <h2 id="card-back-text" style="font-size: 1.8rem; line-height: 1.3;">Pathophysiology</h2>
-              <div style="margin-top: 2rem; opacity: 0.4; font-size: 0.8rem;">Click to flip back</div>
-            </div>
-          </div>
+      <div id="rationale-container" class="simple-rationale-box">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+          <div class="simple-label">Rationale</div>
+          <button class="audio-btn" onclick="speakRationale()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 5L6 9H2v6h4l5 4V5z"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14M15.54 8.46a5 5 0 0 1 0 7.07"/></svg></button>
         </div>
-
-        <div class="flashcard-nav">
-          <button class="btn-secondary" onclick="event.stopPropagation(); prevCard()" style="flex: 1;">Previous</button>
-          <button class="btn-primary" onclick="event.stopPropagation(); nextCard()" style="flex: 1;">Next Card</button>
-        </div>
+        <div id="rationale-text" class="simple-text"></div>
       </div>
-    </div>
-    <div id="result-screen" class="quiz-card animate-fade" style="display: none;">
-      <h1>Quiz Complete!</h1>
-      <div class="results-container">
-        <div class="score-circle">
-          <div class="score-val" id="final-score">0</div>
-          <div class="score-label">out of <span id="max-score">0</span></div>
-        </div>
-        <p id="performance-msg" style="margin-bottom: 2rem; color: var(--text-muted);"></p>
-        <div class="quiz-footer" style="justify-content: center; gap: 1rem;">
-          <button class="btn-secondary" style="flex: 1;" onclick="goHome()">Finish (Go to Home)</button>
-          <button class="btn-primary" style="flex: 1;" onclick="restartQuiz()">Try Again</button>
-        </div>
-      </div><!-- End results-container -->
-    </div><!-- End result-screen -->
-  </div><!-- End container -->
-
-  <div id="explanation-modal" class="modal-overlay" style="display: none;">
-    <div class="modal-content glass" style="max-width: 600px; text-align: left;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <h2 id="explanation-title" style="margin-bottom: 0; color: var(--primary);">Explanation</h2>
-        <div style="display: flex; gap: 0.8rem; align-items: center;">
-          <button id="copy-explanation-btn" class="btn-copy-text" onclick="copyExplanationText()"
-            title="Copy to Clipboard">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
-              <rect x="8" y="2" width="8" height="4" rx="1" ry="1"></rect>
-            </svg>
-            <span>Copy</span>
-          </button>
-          <button class="btn-save-note" onclick="saveCurrentExplanation()" title="Save to Study Guide">
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              stroke-linecap="round" stroke-linejoin="round">
-              <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
-            </svg>
-            <span>Save</span>
-          </button>
-        </div>
-      </div>
-      <div id="explanation-body" class="explanation-text-content"
-        style="max-height: 400px; overflow-y: auto; padding-right: 10px;">
-        <!-- Content injected here -->
-      </div>
-      <div style="margin-top: 2rem;">
-        <button class="btn-primary" style="width: 100%;" onclick="closeExplanation()">Got it!</button>
-      </div>
+      <button id="next-btn" class="btn-primary" style="width: 100%; margin-top: 1.5rem;" onclick="advanceQuestion()">Next Question</button>
     </div>
   </div>
 
   <!-- Flashcard Modal -->
-  <div id="flashcard-modal" class="modal" style="display: none; z-index: 2000;">
-    <div class="modal-content" style="max-width: 500px; height: 600px; background: transparent; box-shadow: none; padding: 0; display: flex; flex-direction: column; justify-content: center; align-items: center;">
-      <div class="flashcard-container" id="flashcard-card" onclick="flipFlashcard()">
+  <div id="flashcard-modal" class="modal-overlay" style="display: none; z-index: 3000;">
+    <div class="modal-content" style="max-width: 500px; background: transparent; box-shadow: none;">
+      <div class="flashcard-container" id="flashcard-card" onclick="this.classList.toggle('is-flipped')">
         <div class="flashcard-inner">
           <div class="flashcard-front">
-            <div id="fc-front-text" style="font-size: 1.2rem; font-weight: 700; text-align: center; padding: 2rem;"></div>
+            <div id="card-front-text" style="font-size: 1.1rem; font-weight: 600; text-align: center;"></div>
           </div>
           <div class="flashcard-back">
-            <div id="fc-back-text" style="font-size: 1rem; line-height: 1.6; text-align: center; padding: 2rem;"></div>
+            <h2 id="card-back-text" style="font-size: 1.5rem; margin-bottom: 1rem;"></h2>
+            <div id="card-back-detail" style="font-size: 0.9rem; opacity: 0.8; text-align: left; overflow-y: auto; max-height: 180px;"></div>
           </div>
         </div>
       </div>
-      <div style="margin-top: 2rem; display: flex; gap: 1rem; width: 100%;">
-        <button class="btn-secondary" style="flex: 1;" onclick="prevFlashcard()">Previous</button>
-        <button class="btn-primary" style="flex: 1;" onclick="nextFlashcard()">Next</button>
+      <div style="margin-top: 2rem; display: flex; gap: 1rem;">
+        <button class="btn-secondary" style="flex: 1;" onclick="prevCard()">Previous</button>
+        <button class="btn-primary" style="flex: 1;" onclick="nextCard()">Next</button>
       </div>
-      <button class="btn-secondary" style="margin-top: 1rem; width: 100%; border: none; background: rgba(255,255,255,0.05);" onclick="closeFlashcards()">Exit Flashcards</button>
+      <button class="btn-secondary" style="margin-top: 1rem; width: 100%; background: rgba(255,255,255,0.05);" onclick="closeFlashcards()">Exit Study Mode</button>
     </div>
   </div>
 
-  <!-- AI Chat Modal -->
-  <div id="chat-modal" class="modal" style="display: none; z-index: 2100;">
-    <div class="modal-content" style="max-width: 600px; height: 80vh; display: flex; flex-direction: column;">
-      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
-        <h2 style="margin: 0; font-size: 1.2rem; color: var(--accent-pink);">Chat with Babi</h2>
-        <button onclick="closeChat()" style="background: none; border: none; color: white; cursor: pointer; font-size: 1.2rem;">✕</button>
+  <!-- Settings Modal -->
+  <div id="settings-modal" class="modal-overlay" style="display: none; z-index: 4000;">
+    <div class="modal-content glass" style="max-width: 400px;">
+      <h2>Settings</h2>
+      <div class="input-group" style="text-align: left; margin-bottom: 1.5rem;">
+        <label>Gemini API Key</label>
+        <input type="password" id="api-key-input" placeholder="Paste your key here...">
       </div>
-      <div id="chat-messages" style="flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 1rem; padding-right: 10px; margin-bottom: 1rem;">
-        <div style="background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border-radius: 15px 15px 15px 0; align-self: flex-start; max-width: 80%; font-size: 0.9rem;">
-          Hello! I'm Babi. Ask me anything about your nursing notes or pathophysiology!
-        </div>
+      <div class="input-group" style="text-align: left;">
+        <label>AI Model</label>
+        <select id="model-select" style="width: 100%;"><option value="gemini-1.5-flash">Gemini 1.5 Flash</option><option value="gemini-1.5-pro">Gemini 1.5 Pro</option></select>
       </div>
-      <div style="display: flex; gap: 0.8rem;">
-        <input type="text" id="chat-input" placeholder="Type your question..." style="flex: 1; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border); color: white; padding: 0.8rem 1.2rem; border-radius: 50px;" onkeypress="if(event.key==='Enter') sendChatMessage()">
-        <button class="btn-primary" style="border-radius: 50px; padding: 0 1.5rem;" onclick="sendChatMessage()">Send</button>
+      <button class="btn-secondary" style="width: 100%; margin-top: 1rem; font-size: 0.8rem;" onclick="runDiagnosticTest()">🧪 Test AI Connection</button>
+      <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+        <button class="btn-secondary" style="flex: 1;" onclick="toggleSettings()">Cancel</button>
+        <button class="btn-primary" style="flex: 1;" onclick="saveSettings()">Save Changes</button>
       </div>
+    </div>
+  </div>
+
+  <!-- Result Screen -->
+  <div id="result-screen" class="modal-overlay" style="display: none; z-index: 5000;">
+    <div class="modal-content" style="max-width: 500px; text-align: center;">
+      <h1 style="color: var(--accent-blue);">Quiz Complete!</h1>
+      <div style="font-size: 3rem; font-weight: 800; margin: 2rem 0;"><span id="score">0</span> / <span id="max-score">0</span></div>
+      <button class="btn-primary" style="width: 100%;" onclick="showDashboard()">Back to Dashboard</button>
+    </div>
+  </div>
+
+  <!-- Loading Overlay -->
+  <div id="loading-overlay" class="modal-overlay" style="display: none; z-index: 9999;">
+    <div style="text-align: center; width: 100%; max-width: 350px;">
+      <h2 style="font-weight: 500; font-size: 0.9rem; letter-spacing: 0.2em; color: white;">AI PROCESSING...</h2>
+      <div style="margin-top: 2rem; background: rgba(255,255,255,0.1); border-radius: 10px; height: 6px; width: 100%; overflow: hidden;">
+        <div id="loading-fill-bar" style="height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-purple), var(--accent-blue)); transition: width 0.3s;"></div>
+      </div>
+      <p id="loading-status" style="margin-top: 1rem; font-size: 0.75rem; color: var(--text-dim);">Connecting to medical brain...</p>
     </div>
   </div>
 
   <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
   <script src="script.js"></script>
 </body>
-
 </html>

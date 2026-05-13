@@ -29,13 +29,9 @@ body {
   background: var(--bg-deep);
   color: var(--text-bright);
   min-height: 100vh;
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  /* Changed from center to allow scrolling */
-  padding: 4rem 2rem;
-  /* Increased padding for breathing room */
+  margin: 0;
   font-family: 'Outfit', sans-serif;
+  overflow: hidden; /* Main window doesn't scroll, sections do */
 }
 
 body::before {
@@ -46,12 +42,89 @@ body::before {
   z-index: -1;
 }
 
+/* Sidebar Layout */
+.app-shell {
+  display: grid;
+  grid-template-columns: 280px 1fr;
+  height: 100vh;
+  width: 100vw;
+}
+
+.sidebar {
+  background: rgba(255, 255, 255, 0.02);
+  border-right: 1px solid var(--glass-border);
+  backdrop-filter: blur(20px);
+  padding: 2.5rem 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  z-index: 100;
+}
+
+.sidebar-logo {
+  font-weight: 700;
+  font-size: 1.4rem;
+  color: var(--text-bright);
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+}
+
+.nav-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.8rem 1.2rem;
+  border-radius: 16px;
+  color: var(--text-dim);
+  text-decoration: none;
+  font-weight: 500;
+  transition: all 0.3s;
+  cursor: pointer;
+}
+
+.nav-item:hover {
+  background: rgba(255, 255, 255, 0.05);
+  color: var(--text-bright);
+}
+
+.nav-item.active {
+  background: rgba(123, 44, 191, 0.1);
+  color: var(--accent-purple);
+  border: 1px solid rgba(123, 44, 191, 0.2);
+}
+
+.main-content {
+  flex: 1;
+  padding: 2.5rem;
+  overflow-y: auto;
+  background: radial-gradient(circle at 10% 10%, rgba(123, 44, 191, 0.05) 0%, transparent 50%);
+}
+
+.view-section {
+  display: none; /* Controlled by JS */
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.view-section.active {
+  display: block;
+  animation: fadeIn 0.4s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
 .container {
   width: 100%;
-  max-width: 1400px;
-  /* Expanded for maximized feel */
-  margin: 0 auto;
-  padding: 0 1rem;
 }
 
 /* Bento Grid System */
