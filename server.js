@@ -36,7 +36,7 @@ app.post('/api/listAvailableModels', async (req, res) => {
   if (!apiKey) return res.json([]);
 
   try {
-    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${apiKey}`);
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1/models?key=${apiKey}`);
     if (!response.ok) return res.json([]);
     const data = await response.json();
     const available = data.models
@@ -67,13 +67,14 @@ async function _callGemini(prompt, selectedModel) {
   const apiKey = getApiKey();
   if (!apiKey) throw new Error("No API Key found. Please add one in Settings.");
 
-  // Switch default to Flash for 1,500 RPM limit (Pro is only 2 RPM)
-  // Ensure model name has 'models/' prefix for the URL if missing
-  const modelName = (selectedModel || 'gemini-1.5-flash').startsWith('models/') 
-    ? (selectedModel || 'gemini-1.5-flash') 
-    : `models/${selectedModel || 'gemini-1.5-flash'}`;
+  // Ensure model name has 'models/' prefix
+  let modelName = selectedModel || 'gemini-1.5-flash';
+  if (!modelName.startsWith('models/')) {
+    modelName = `models/${modelName}`;
+  }
     
-  const url = `https://generativelanguage.googleapis.com/v1beta/${modelName}:generateContent?key=${apiKey}`;
+  // Use v1 stable instead of v1beta for better compatibility
+  const url = `https://generativelanguage.googleapis.com/v1/${modelName}:generateContent?key=${apiKey}`;
 
   const payload = {
     "contents": [{ "parts": [{ "text": prompt }] }]
