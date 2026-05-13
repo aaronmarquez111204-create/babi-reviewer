@@ -226,8 +226,8 @@
   </div>
 
   <!-- QUIZ SCREEN (OVERLAY) -->
-  <div id="quiz-screen" class="quiz-card animate-fade" style="display: none; position: fixed; inset: 0; z-index: 1000; border-radius: 0; width: 100vw; height: 100vh;">
-    <div style="max-width: 800px; margin: 0 auto; height: 100%; display: flex; flex-direction: column; padding: 2rem;">
+  <div id="quiz-screen" class="animate-fade" style="display: none; position: fixed; inset: 0; z-index: 1000; width: 100vw; height: 100vh; overflow-y: auto; background: var(--bg-deep);">
+    <div style="max-width: 800px; margin: 0 auto; min-height: 100%; display: flex; flex-direction: column; padding: 2rem;">
       <div class="quiz-header">
         <div style="display:flex; align-items:center; gap:1rem;">
           <button class="btn-secondary" onclick="quitQuiz()" style="padding: 0.4rem 0.8rem; font-size: 0.75rem;">Quit</button>
@@ -239,9 +239,9 @@
         </div>
       </div>
       <div class="progress-container"><div class="progress-bar" id="progress"></div></div>
-      <div id="question-container" style="flex: 1; display: flex; flex-direction: column; justify-content: center;">
+      <div id="question-container" style="flex: 1; display: flex; flex-direction: column; justify-content: center; margin-bottom: 2rem;">
         <div class="question-text" id="question">Loading...</div>
-        <div class="options-grid" id="options"></div>
+        <div class="options-grid" id="options" style="margin-top: 1.5rem;"></div>
       </div>
       <div class="quiz-footer" style="display: flex; gap: 1rem;">
         <button class="btn-secondary" id="prev-btn" onclick="goPrevious()" style="flex: 1;">Previous</button>
