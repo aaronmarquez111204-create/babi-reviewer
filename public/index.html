@@ -283,7 +283,14 @@
       </div>
       <div class="input-group" style="text-align: left;">
         <label>AI Model</label>
-        <select id="model-select" style="width: 100%;"><option value="gemini-1.5-flash">Gemini 1.5 Flash</option><option value="gemini-1.5-pro">Gemini 1.5 Pro</option></select>
+        <div style="display: flex; gap: 0.5rem;">
+          <select id="model-select" style="flex: 1;">
+            <option value="gemini-1.5-flash">Gemini 1.5 Flash</option>
+            <option value="gemini-1.5-pro">Gemini 1.5 Pro</option>
+          </select>
+          <button class="btn-secondary" style="padding: 0 1rem; font-size: 0.7rem;" onclick="scanModels(this)">Scan</button>
+        </div>
+        <p id="scan-status" style="font-size: 0.6rem; opacity: 0.5; margin-top: 0.3rem;">Scan to find available models for your account.</p>
       </div>
       <button class="btn-secondary" style="width: 100%; margin-top: 1rem; font-size: 0.8rem;" onclick="runDiagnosticTest()">🧪 Test AI Connection</button>
       <div style="display: flex; gap: 1rem; margin-top: 2rem;">
