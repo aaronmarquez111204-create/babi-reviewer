@@ -68,8 +68,12 @@ async function _callGemini(prompt, selectedModel) {
   if (!apiKey) throw new Error("No API Key found. Please add one in Settings.");
 
   // Switch default to Flash for 1,500 RPM limit (Pro is only 2 RPM)
-  const modelToUse = selectedModel || 'gemini-1.5-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelToUse}:generateContent?key=${apiKey}`;
+  // Ensure model name has 'models/' prefix for the URL if missing
+  const modelName = (selectedModel || 'gemini-1.5-flash').startsWith('models/') 
+    ? (selectedModel || 'gemini-1.5-flash') 
+    : `models/${selectedModel || 'gemini-1.5-flash'}`;
+    
+  const url = `https://generativelanguage.googleapis.com/v1beta/${modelName}:generateContent?key=${apiKey}`;
 
   const payload = {
     "contents": [{ "parts": [{ "text": prompt }] }]

@@ -1384,8 +1384,9 @@ async function sendChatMessage() {
 
   try {
     const context = document.getElementById('ai-context').value;
+    const activeModel = document.getElementById('model-select').value;
     const response = await callBackend('testAiConnection', { 
-      selectedModel: 'gemini-1.5-flash',
+      selectedModel: activeModel,
       prompt: `User says: ${text}\n\nContext from notes: ${context}\n\nReply as a helpful nursing tutor.`
     });
     
