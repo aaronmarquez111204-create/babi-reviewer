@@ -1385,9 +1385,9 @@ async function sendChatMessage() {
   try {
     const context = document.getElementById('ai-context').value;
     const activeModel = document.getElementById('model-select').value;
-    const response = await callBackend('testAiConnection', { 
+    const response = await callBackend('chat', { 
       selectedModel: activeModel,
-      prompt: `User says: ${text}\n\nContext from notes: ${context}\n\nReply as a helpful nursing tutor.`
+      prompt: `I am a nursing student. Based on these notes: "${context}", please answer my question: "${text}"`
     });
     
     typingMsg.remove();

@@ -62,6 +62,17 @@ app.post('/api/testAiConnection', async (req, res) => {
   }
 });
 
+// 5. Endpoint: AI Tutor Chat
+app.post('/api/chat', async (req, res) => {
+  const { prompt, selectedModel } = req.body;
+  try {
+    const result = await _callGemini(prompt, selectedModel);
+    res.json(result);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // Internal Gemini Call logic with Retry
 async function _callGemini(prompt, selectedModel) {
   const apiKey = getApiKey();
