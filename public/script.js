@@ -1051,6 +1051,40 @@ function restartQuiz() {
   startTimer();
 }
 
+function printStudyGuide() {
+  window.print();
+}
+
+function generateMnemonic() {
+  const contextText = document.getElementById('ai-context').value;
+  if (!contextText || contextText.trim().length < 50) {
+    alert("Please paste some text first (at least 50 characters).");
+    return;
+  }
+
+  const modelSelect = document.getElementById('model-select');
+  const selectedModel = modelSelect ? modelSelect.value : null;
+
+  showLoading("Babi is creating a memory aid for you...");
+
+  if (isWeb) {
+    callBackend('generateMnemonic', { contextText, selectedModel }).then(res => {
+      hideLoading();
+      showExplanationModal("Mnemonic Guide", res.mnemonic);
+    }).catch(err => {
+      hideLoading();
+      const originalMsg = err.message || "Unknown error";
+      let msg = "Generation failed: " + originalMsg;
+      if (originalMsg.includes("503")) msg = "Babi's AI brain is very busy! Try again.";
+      if (originalMsg.includes("429") || originalMsg.includes("quota")) msg = "Free Limit Reached! Try again later.";
+      alert(msg);
+    });
+  } else {
+    alert("Mnemonic feature currently requires the Node backend.");
+    hideLoading();
+  }
+}
+
 /**
  * NEW: Content Simplification Feature
  */

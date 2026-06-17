@@ -999,3 +999,41 @@ input:checked + .slider:before {
     padding: 1.5rem !important;
   }
 }
+
+/* Print Styles for Exporting to PDF */
+@media print {
+  body {
+    background: white !important;
+    color: black !important;
+  }
+  body::before {
+    display: none !important;
+  }
+  .app-shell, .blob {
+    display: none !important;
+  }
+  #explanation-modal {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: none !important;
+    display: block !important;
+  }
+  #explanation-modal .modal-content {
+    border: none !important;
+    background: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    max-width: 100% !important;
+  }
+  .explanation-text-content {
+    max-height: none !important;
+    overflow: visible !important;
+    color: black !important;
+  }
+  button, svg {
+    display: none !important;
+  }
+}

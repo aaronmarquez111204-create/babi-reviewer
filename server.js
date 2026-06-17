@@ -185,6 +185,19 @@ app.post('/api/explainContent', async (req, res) => {
   }
 });
 
+// 6.5 Endpoint: Generate Mnemonic
+app.post('/api/generateMnemonic', async (req, res) => {
+  const { contextText, selectedModel } = req.body;
+  const prompt = `Act as an expert nursing tutor. Generate a highly catchy and memorable acronym or mnemonic for the following medical/nursing text. Format your response clearly using Markdown. Make sure it is directly applicable for rote memorization in an exam setting.\n\nText:\n${contextText}`;
+
+  try {
+    const text = await _callGemini(prompt, selectedModel);
+    res.json({ mnemonic: text });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
+  }
+});
+
 // 7. Endpoint: Define Word
 app.post('/api/defineWord', async (req, res) => {
   const { word, contextText, selectedModel } = req.body;
