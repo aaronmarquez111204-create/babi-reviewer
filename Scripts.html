@@ -1017,6 +1017,45 @@
   }
 
   /**
+   * Helper: Formats markdown-like text to HTML
+   */
+  function formatMarkdown(rawContent) {
+    if (!rawContent) return "";
+    
+    // Trim and clean prefix
+    let content = rawContent.replace(/^Success:\s*/i, '').trim();
+
+    return content
+      // 1. Convert headers (###, ##, #)
+      .replace(/^### (.*$)/gim, '<h3 style="margin-top: 1rem; margin-bottom: 0.5rem; color: var(--accent-purple); font-size: 1.15rem; font-weight: 600;">$1</h3>')
+      .replace(/^## (.*$)/gim, '<h3 style="margin-top: 1.1rem; margin-bottom: 0.55rem; color: var(--accent-purple); font-size: 1.2rem; font-weight: 600;">$1</h3>')
+      .replace(/^# (.*$)/gim, '<h2 style="margin-top: 1.2rem; margin-bottom: 0.6rem; color: var(--accent-purple); font-size: 1.3rem; font-weight: 700;">$1</h2>')
+
+      // 2. Convert standard bold **text**
+      .replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>')
+
+      // 3. VAPORIZE all remaining unmatched double asterisks
+      .replace(/\*\*/g, '')
+
+      // 4. Convert bullets (* or - with space at the beginning of line)
+      .replace(/^\s*[\*\-]\s+(.*$)/gim, '<ul style="margin: 0.4rem 0; padding-left: 1.2rem;"><li style="margin-bottom: 0.4rem; list-style-type: disc; line-height: 1.5;">$1</li></ul>')
+
+      // 5. Convert standard italic *text* 
+      .replace(/\*(?!\s)([^\*]+)(?<!\s)\*/g, '<em>$1</em>')
+
+      // 6. VAPORIZE all remaining single asterisks
+      .replace(/\*/g, '')
+
+      // 7. Handle line breaks
+      .replace(/\n\n/g, '<br><br>')
+      .replace(/\n/g, '<br>')
+
+      // 8. Merge consecutive list items
+      .replace(/<\/ul><br><ul style="margin: 0.4rem 0; padding-left: 1.2rem;">/g, '')
+      .replace(/<\/ul>\s*<ul style="margin: 0.4rem 0; padding-left: 1.2rem;">/g, '');
+  }
+
+  /**
    * Helper: Show Explanation Modal with formatted content
    */
   function showExplanationModal(title, rawContent) {
@@ -1032,36 +1071,7 @@
     document.getElementById('explanation-title').textContent = title;
     const body = document.getElementById('explanation-body');
 
-    // Advanced Markdown to HTML Conversion
-    let html = mainContent
-      // 1. Convert headers
-      .replace(/^### (.*$)/gim, '<h3 style="margin-top: 1rem; margin-bottom: 0.5rem; color: var(--accent-purple);">$1</h3>')
-      .replace(/^## (.*$)/gim, '<h3 style="margin-top: 1rem; margin-bottom: 0.5rem; color: var(--accent-purple);">$1</h3>')
-      
-      // 2. Convert standard bold **text**
-      .replace(/\*\*([^\*]+)\*\*/g, '<strong>$1</strong>')
-      
-      // 3. VAPORIZE all remaining unmatched double asterisks
-      .replace(/\*\*/g, '')
-      
-      // 4. Convert bullets (* or - with space at the beginning of line)
-      .replace(/^\s*[\*\-]\s+(.*$)/gim, '<ul><li style="margin-left: 1.5rem; margin-bottom: 0.6rem; list-style-type: disc; line-height: 1.5;">$1</li></ul>')
-      
-      // 5. Convert standard italic *text* 
-      .replace(/\*(?!\s)([^\*]+)(?<!\s)\*/g, '<em>$1</em>')
-      
-      // 6. VAPORIZE all remaining single asterisks
-      .replace(/\*/g, '')
-
-      // 7. Handle line breaks
-      .replace(/\n\n/g, '<br><br>')
-      .replace(/\n/g, '<br>')
-      
-      // 8. Merge consecutive list items
-      .replace(/<\/ul><br><ul>/g, '')
-      .replace(/<\/ul>\s*<ul>/g, '');
-
-    body.innerHTML = html;
+    body.innerHTML = formatMarkdown(mainContent);
     document.getElementById('explanation-modal').style.display = 'flex';
   }
 
