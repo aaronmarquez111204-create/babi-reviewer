@@ -84,15 +84,15 @@ async function _callGemini(prompt, selectedModel, expectJson = false) {
     modelName = `models/${modelName}`;
   }
     
-  // Use v1 stable instead of v1beta for better compatibility
-  const url = `https://generativelanguage.googleapis.com/v1/${modelName}:generateContent?key=${apiKey}`;
+  // Use v1beta to support advanced features like responseMimeType (JSON Mode)
+  const url = `https://generativelanguage.googleapis.com/v1beta/${modelName}:generateContent?key=${apiKey}`;
 
   const payload = {
     "contents": [{ "parts": [{ "text": prompt }] }]
   };
 
   if (expectJson) {
-    payload.generationConfig = { response_mime_type: "application/json" };
+    payload.generationConfig = { responseMimeType: "application/json" };
   }
 
   let attempts = 0;
