@@ -74,7 +74,7 @@ app.post('/api/chat', async (req, res) => {
 });
 
 // Internal Gemini Call logic with Retry
-async function _callGemini(prompt, selectedModel) {
+async function _callGemini(prompt, selectedModel, expectJson = false) {
   const apiKey = getApiKey();
   if (!apiKey) throw new Error("No API Key found. Please add one in Settings.");
 
@@ -90,6 +90,10 @@ async function _callGemini(prompt, selectedModel) {
   const payload = {
     "contents": [{ "parts": [{ "text": prompt }] }]
   };
+
+  if (expectJson) {
+    payload.generationConfig = { responseMimeType: "application/json" };
+  }
 
   let attempts = 0;
   const maxAttempts = 5;
@@ -166,7 +170,7 @@ app.post('/api/generateQuiz', async (req, res) => {
       
       const prompt = `You are an elite nursing AI creating a challenging ${currentBatch}-question multiple choice quiz.\n\nThe context to generate the quiz from is below:\n\n---\n${contextText}\n---\n${historyPrompt}\nINSTRUCTIONS:\n1. Create EXACTLY ${currentBatch} DISTINCT questions.\n2. Output MUST be ONLY a valid raw JSON array of objects. No markdown, No text before or after.\n3. Each JSON object MUST follow this EXACT structure:\n   {"question": "The question text", "options": ["Option A", "Option B", "Option C", "Option D"], "answer": 0, "rationale": "Why option 0 is correct."}\n4. 'answer' MUST be the integer index (0-3) of the correct option.\n5. Keep 'rationale' concise and clear.\n6. STRICT REQUIREMENT: Ensure the JSON syntax is perfectly valid and properly closed.`;
       
-      const rawText = await _callGemini(prompt, selectedModel);
+      const rawText = await _callGemini(prompt, selectedModel, true);
       
       let questions;
       try {
