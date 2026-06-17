@@ -96,7 +96,7 @@ async function _callGemini(prompt, selectedModel, expectJson = false) {
   }
 
   let attempts = 0;
-  const maxAttempts = 5;
+  const maxAttempts = 15;
 
   while (attempts < maxAttempts) {
     attempts++;
@@ -125,8 +125,8 @@ async function _callGemini(prompt, selectedModel, expectJson = false) {
         }
       } else if (status === 429) {
         if (attempts >= maxAttempts) throw new Error("429");
-        // Faster retries for a better user experience (2s, 4s, 6s)
-        const wait = attempts * 2000;
+        // Longer retries to smoothly wait out the free tier limit (8s, 11s, 14s...)
+        const wait = 5000 + (attempts * 3000);
         console.log(`Rate limit hit. Retrying in ${wait}ms...`);
         await new Promise(r => setTimeout(r, wait));
       } else if (status === 500 || status === 503) {
