@@ -125,8 +125,7 @@ async function _callGemini(prompt, selectedModel, expectJson = false) {
         }
       } else if (status === 429) {
         if (attempts >= maxAttempts) throw new Error("429");
-        // Longer retries to smoothly wait out the free tier limit (8s, 11s, 14s...)
-        const wait = 5000 + (attempts * 3000);
+        const wait = 15000; // Consistent 15s wait to clear 1M TPM limits gracefully
         console.log(`Rate limit hit. Retrying in ${wait}ms...`);
         await new Promise(r => setTimeout(r, wait));
       } else if (status === 500 || status === 503) {
