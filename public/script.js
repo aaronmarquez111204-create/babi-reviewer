@@ -327,14 +327,40 @@ function generateAIQuiz() {
   }, 2500);
 
   if (isWeb) {
-    callBackend('generateQuiz', { contextText, count, selectedModel }).then(res => {
-      clearInterval(interval);
-      // Server returns the array directly, not wrapped in an object
-      handleQuizSuccess(Array.isArray(res) ? res : res.questions);
-    }).catch(err => {
-      clearInterval(interval);
-      handleQuizFailure(err);
-    });
+    const batchSize = 20;
+    let allQuestions = [];
+    let remaining = count;
+
+    const runBatches = async () => {
+      try {
+        while (remaining > 0) {
+          const currentBatch = Math.min(remaining, batchSize);
+          
+          document.getElementById('loading-status').textContent = `Generating questions ${count - remaining + 1} to ${count - remaining + currentBatch} of ${count}...`;
+          
+          const historyPromptText = allQuestions.map((q, i) => `${i+1}. ${q.question}`).join('\n');
+
+          const res = await callBackend('generateQuiz', { 
+            contextText, 
+            count: currentBatch, 
+            selectedModel,
+            historyPromptText 
+          });
+          
+          const newQuestions = Array.isArray(res) ? res : res.questions;
+          if (newQuestions && newQuestions.length > 0) {
+             allQuestions = allQuestions.concat(newQuestions);
+          }
+          remaining -= currentBatch;
+        }
+        clearInterval(interval);
+        handleQuizSuccess(allQuestions);
+      } catch (err) {
+        clearInterval(interval);
+        handleQuizFailure(err);
+      }
+    };
+    runBatches();
   } else {
     google.script.run
       .withSuccessHandler(data => {

@@ -150,25 +150,16 @@ async function _callGemini(prompt, selectedModel, expectJson = false) {
 
 // 5. Endpoint: Generate Quiz
 app.post('/api/generateQuiz', async (req, res) => {
-  const { contextText, count, selectedModel } = req.body;
-  const numQuestions = count || 10; // Default to 10 if not provided
-  
-  const batchSize = 20; // 20 questions max per request to avoid hitting the 8192 output token limit
-  let allQuestions = [];
+  const { contextText, count, selectedModel, historyPromptText } = req.body;
+  const numQuestions = count || 10;
   
   try {
-    let remaining = numQuestions;
-    
-    while (remaining > 0) {
-      const currentBatch = Math.min(remaining, batchSize);
-      
       let historyPrompt = "";
-      if (allQuestions.length > 0) {
-        const asked = allQuestions.map((q, i) => `${i+1}. ${q.question}`).join('\n');
-        historyPrompt = `\nCRITICAL: You have already asked the following questions. DO NOT ask them again or test the exact same concepts:\n${asked}\n`;
+      if (historyPromptText && historyPromptText.length > 0) {
+        historyPrompt = `\nCRITICAL: You have already asked the following questions. DO NOT ask them again or test the exact same concepts:\n${historyPromptText}\n`;
       }
       
-      const prompt = `You are an elite nursing AI creating a challenging ${currentBatch}-question multiple choice quiz.\n\nThe context to generate the quiz from is below:\n\n---\n${contextText}\n---\n${historyPrompt}\nINSTRUCTIONS:\n1. Create EXACTLY ${currentBatch} DISTINCT questions.\n2. Output MUST be ONLY a valid raw JSON array of objects. No markdown, No text before or after.\n3. Each JSON object MUST follow this EXACT structure:\n   {"question": "The question text", "options": ["Option A", "Option B", "Option C", "Option D"], "answer": 0, "rationale": "Why option 0 is correct."}\n4. 'answer' MUST be the integer index (0-3) of the correct option.\n5. Keep 'rationale' concise and clear.\n6. STRICT REQUIREMENT: Ensure the JSON syntax is perfectly valid and properly closed.`;
+      const prompt = `You are an elite nursing AI creating a challenging ${numQuestions}-question multiple choice quiz.\n\nThe context to generate the quiz from is below:\n\n---\n${contextText}\n---\n${historyPrompt}\nINSTRUCTIONS:\n1. Create EXACTLY ${numQuestions} DISTINCT questions.\n2. Output MUST be ONLY a valid raw JSON array of objects. No markdown, No text before or after.\n3. Each JSON object MUST follow this EXACT structure:\n   {"question": "The question text", "options": ["Option A", "Option B", "Option C", "Option D"], "answer": 0, "rationale": "Why option 0 is correct."}\n4. 'answer' MUST be the integer index (0-3) of the correct option.\n5. Keep 'rationale' concise and clear.\n6. STRICT REQUIREMENT: Ensure the JSON syntax is perfectly valid and properly closed.`;
       
       const rawText = await _callGemini(prompt, selectedModel, true);
       
@@ -180,22 +171,11 @@ app.post('/api/generateQuiz', async (req, res) => {
         if (match) {
           questions = JSON.parse(match[0]);
         } else {
-          throw new Error(`AI returned invalid JSON at batch ${allQuestions.length / batchSize + 1}. Try again.`);
+          throw new Error(`AI returned invalid JSON. Try again.`);
         }
       }
       
-      if (Array.isArray(questions)) {
-        allQuestions = allQuestions.concat(questions);
-      }
-      
-      remaining -= currentBatch;
-      
-      if (remaining > 0) {
-        await new Promise(r => setTimeout(r, 1000)); // Respect rate limits
-      }
-    }
-    
-    res.json(allQuestions.slice(0, numQuestions)); 
+      res.json(questions); 
   } catch (err) {
     res.status(500).json({ error: err.message });
   }
