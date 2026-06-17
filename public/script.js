@@ -1573,3 +1573,330 @@ window.addEventListener('DOMContentLoaded', () => {
   updateSRS(); // Initial SRS check
   setTimeout(updateChartData, 1000);
 });
+
+/**
+ * POMODORO TIMER LOGIC
+ */
+let pomoInterval;
+let pomoTimeLeft = 25 * 60;
+let isPomoRunning = false;
+let isPomoBreak = false;
+
+function formatPomoTime(seconds) {
+  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const s = (seconds % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function updatePomoDisplay() {
+  const timeEl = document.getElementById('pomo-time');
+  const labelEl = document.getElementById('pomo-label');
+  if (timeEl) timeEl.innerText = formatPomoTime(pomoTimeLeft);
+  if (labelEl) labelEl.innerText = isPomoBreak ? "Break Time" : "Focus Time";
+}
+
+function togglePomodoro() {
+  if (isPomoRunning) {
+    clearInterval(pomoInterval);
+    isPomoRunning = false;
+    document.getElementById('btn-pomo-start').innerText = "Start";
+  } else {
+    isPomoRunning = true;
+    document.getElementById('btn-pomo-start').innerText = "Pause";
+    pomoInterval = setInterval(() => {
+      pomoTimeLeft--;
+      if (pomoTimeLeft <= 0) {
+        clearInterval(pomoInterval);
+        isPomoRunning = false;
+        
+        if (isPomoBreak) {
+          isPomoBreak = false;
+          pomoTimeLeft = 25 * 60;
+        } else {
+          isPomoBreak = true;
+          pomoTimeLeft = 5 * 60;
+          alert("Focus session complete! Take a 5 minute break.");
+        }
+        document.getElementById('btn-pomo-start').innerText = "Start";
+      }
+  messagesCont.appendChild(typingMsg);
+
+  try {
+    const context = document.getElementById('ai-context').value;
+    const activeModel = document.getElementById('model-select').value;
+    const response = await callBackend('chat', { 
+      selectedModel: activeModel,
+      prompt: `I am a nursing student. Based on these notes: "${context}", please answer my question: "${text}"`
+    });
+    
+    typingMsg.remove();
+    const aiMsg = document.createElement('div');
+    aiMsg.style = "background: rgba(255,255,255,0.05); padding: 0.8rem 1rem; border-radius: 15px 15px 15px 0; align-self: flex-start; max-width: 80%; font-size: 0.9rem; line-height: 1.5;";
+    aiMsg.innerHTML = formatMarkdown(response);
+    messagesCont.appendChild(aiMsg);
+  } catch (err) {
+    typingMsg.textContent = "Error: " + err.message;
+  }
+  
+  messagesCont.scrollTop = messagesCont.scrollHeight;
+}
+
+/**
+ * NEW: Performance Charting
+ */
+function initPerformanceChart() {
+  const ctx = document.getElementById('performanceChart');
+  if (!ctx || performanceChart) return;
+
+  performanceChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: [],
+      datasets: [{
+        label: 'Score %',
+        data: [],
+        borderColor: '#ff9e00',
+        backgroundColor: 'rgba(255, 158, 0, 0.1)',
+        tension: 0.4,
+        fill: true,
+        pointRadius: 4,
+        pointBackgroundColor: '#fff'
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { display: false },
+        y: { 
+          beginAtZero: true, 
+          max: 100,
+          grid: { color: 'rgba(255,255,255,0.05)' },
+          ticks: { color: 'rgba(255,255,255,0.3)', font: { size: 10 } }
+        }
+      }
+    }
+  });
+}
+
+function updateChartData() {
+  if (!performanceChart) initPerformanceChart();
+  if (!performanceChart) return;
+
+  const history = JSON.parse(localStorage.getItem('studyHistory') || '[]');
+  const scores = history.slice(-10).map(h => (h.score / h.total) * 100);
+  const labels = history.slice(-10).map(h => h.date);
+
+  performanceChart.data.labels = labels;
+  performanceChart.data.datasets[0].data = scores;
+  performanceChart.update();
+}
+
+/**
+ * MASTER: PDF Text Extraction
+ */
+async function handlePDFUpload(event) {
+  const file = event.target.files[0];
+  if (!file) return;
+
+  showLoading("Reading PDF content...");
+  
+  try {
+    const reader = new FileReader();
+    reader.onload = async function() {
+      const typedarray = new Uint8Array(this.result);
+      const pdf = await pdfjsLib.getDocument(typedarray).promise;
+      let fullText = "";
+
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const textContent = await page.getTextContent();
+        fullText += textContent.items.map(item => item.str).join(" ") + "\n";
+      }
+
+      document.getElementById('ai-context').value = fullText.trim();
+      document.getElementById('ai-title').value = file.name.replace('.pdf', '');
+      hideLoading();
+    };
+    reader.readAsArrayBuffer(file);
+  } catch (err) {
+    console.error(err);
+    alert("Error reading PDF. Make sure it's not password protected.");
+    hideLoading();
+  }
+}
+
+/**
+ * MASTER: Spaced Repetition (SRS)
+ */
+function updateSRS() {
+  const container = document.getElementById('srs-container');
+  if (!container) return;
+
+  const history = JSON.parse(localStorage.getItem('babisStudyHistory') || '[]');
+  const now = Date.now();
+  const threeDays = 3 * 24 * 60 * 60 * 1000;
+  
+  // Find quizzes where score < 80% and last taken > 3 days ago
+  const due = history.filter(record => {
+    const isDue = (now - record.timestamp) > threeDays;
+    const isLow = (record.score / record.total) < 0.8;
+    return isDue && isLow;
+  }).slice(0, 3); // Top 3 suggestions
+
+  if (due.length === 0) {
+    container.innerHTML = '<div style="opacity:0.4; font-size:0.8rem; text-align:center; padding:1rem;">Your memory is fresh! Nothing due.</div>';
+    return;
+  }
+
+  container.innerHTML = due.map(record => `
+    <div class="score-row animate-fade" style="background: rgba(255,255,255,0.03); padding: 0.8rem; border-radius: 12px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05);">
+      <div style="flex: 1;">
+        <div style="font-size: 0.85rem; font-weight: 600;">${record.title}</div>
+        <div style="font-size: 0.7rem; color: var(--accent-pink);">Score: ${Math.round((record.score / record.total) * 100)}%</div>
+      </div>
+      <button class="btn-secondary" style="font-size: 0.7rem; padding: 0.3rem 0.6rem;" onclick="switchView('library')">Review</button>
+    </div>
+  `).join('');
+}
+
+// Initial Call to load SRS
+window.addEventListener('DOMContentLoaded', () => {
+  switchView('dashboard');
+  checkSavedData();
+  updateSRS(); // Initial SRS check
+  setTimeout(updateChartData, 1000);
+});
+
+/**
+ * POMODORO TIMER LOGIC
+ */
+let pomoInterval;
+let pomoTimeLeft = 25 * 60;
+let isPomoRunning = false;
+let isPomoBreak = false;
+
+function formatPomoTime(seconds) {
+  const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+  const s = (seconds % 60).toString().padStart(2, '0');
+  return `${m}:${s}`;
+}
+
+function updatePomoDisplay() {
+  const timeEl = document.getElementById('pomo-time');
+  const labelEl = document.getElementById('pomo-label');
+  if (timeEl) timeEl.innerText = formatPomoTime(pomoTimeLeft);
+  if (labelEl) labelEl.innerText = isPomoBreak ? "Break Time" : "Focus Time";
+}
+
+function togglePomodoro() {
+  if (isPomoRunning) {
+    clearInterval(pomoInterval);
+    isPomoRunning = false;
+    document.getElementById('btn-pomo-start').innerText = "Start";
+  } else {
+    isPomoRunning = true;
+    document.getElementById('btn-pomo-start').innerText = "Pause";
+    pomoInterval = setInterval(() => {
+      pomoTimeLeft--;
+      if (pomoTimeLeft <= 0) {
+        clearInterval(pomoInterval);
+        isPomoRunning = false;
+        
+        if (isPomoBreak) {
+          isPomoBreak = false;
+          pomoTimeLeft = 25 * 60;
+        } else {
+          isPomoBreak = true;
+          pomoTimeLeft = 5 * 60;
+          alert("Focus session complete! Take a 5 minute break.");
+        }
+        document.getElementById('btn-pomo-start').innerText = "Start";
+      }
+      updatePomoDisplay();
+    }, 1000);
+  }
+}
+
+function resetPomodoro() {
+  clearInterval(pomoInterval);
+  isPomoRunning = false;
+  isPomoBreak = false;
+  pomoTimeLeft = 25 * 60;
+  document.getElementById('btn-pomo-start').innerText = "Start";
+  updatePomoDisplay();
+}
+
+/**
+ * INTERACTIVE FLASHCARDS LOGIC
+ */
+let flashcardsData = [];
+let currentFlashcardIndex = 0;
+
+function parseFlashcards(text) {
+  const cards = [];
+  const parts = text.split(/---FLASHCARD---/i);
+  if (parts.length > 1) {
+    cards.push({
+      question: parts[1].trim(),
+      answer: parts[0].trim()
+    });
+  }
+  return cards;
+}
+
+function startFlashcards() {
+  const activeGuideTitle = document.getElementById('explanation-title').innerText;
+  const activeGuideText = window.currentExplanationText || "";
+  
+  flashcardsData = parseFlashcards(activeGuideText);
+  if (flashcardsData.length === 0) {
+    flashcardsData.push({
+      question: activeGuideTitle,
+      answer: activeGuideText
+    });
+  }
+
+  currentFlashcardIndex = 0;
+  updateFlashcardUI();
+  document.getElementById('flashcard-modal').style.display = 'flex';
+}
+
+function closeFlashcards() {
+  document.getElementById('flashcard-modal').style.display = 'none';
+  document.getElementById('flashcard-inner').classList.remove('is-flipped');
+}
+
+function flipFlashcard() {
+  const inner = document.getElementById('flashcard-inner');
+  inner.classList.toggle('is-flipped');
+}
+
+function updateFlashcardUI() {
+  const qEl = document.getElementById('flashcard-q');
+  const aEl = document.getElementById('flashcard-a');
+  const counter = document.getElementById('flashcard-counter');
+  
+  if (flashcardsData.length > 0) {
+    qEl.innerText = flashcardsData[currentFlashcardIndex].question;
+    aEl.innerHTML = formatAIResponse(flashcardsData[currentFlashcardIndex].answer);
+    counter.innerText = `${currentFlashcardIndex + 1} / ${flashcardsData.length}`;
+  }
+  
+  document.getElementById('flashcard-inner').classList.remove('is-flipped');
+}
+
+function nextFlashcard() {
+  if (currentFlashcardIndex < flashcardsData.length - 1) {
+    currentFlashcardIndex++;
+    updateFlashcardUI();
+  }
+}
+
+function prevFlashcard() {
+  if (currentFlashcardIndex > 0) {
+    currentFlashcardIndex--;
+    updateFlashcardUI();
+  }
+}
