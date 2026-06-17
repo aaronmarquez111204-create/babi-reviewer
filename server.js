@@ -92,7 +92,7 @@ async function _callGemini(prompt, selectedModel, expectJson = false) {
   };
 
   if (expectJson) {
-    payload.generationConfig = { responseMimeType: "application/json" };
+    payload.generationConfig = { response_mime_type: "application/json" };
   }
 
   let attempts = 0;
