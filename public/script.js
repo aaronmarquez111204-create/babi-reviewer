@@ -78,7 +78,7 @@ const isWeb = !isGAS;
 async function callBackend(funcName, args = {}) {
   if (isWeb) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 90000); // 90s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 300000); // 5 minute timeout for very large PDFs
 
     return fetch(`/api/${funcName}`, {
       method: 'POST',
