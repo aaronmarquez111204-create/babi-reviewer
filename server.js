@@ -13,7 +13,7 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 app.use(express.static('public'));
 
-let memoryApiKey = process.env.GEMINI_API_KEY || null;
+let memoryApiKey = process.env.GEMINI_API_KEY || "AIzaSyDcXRLeE9EOEEeTo2uhYTNriCAzRjJuopk";
 
 // Helper to get active API key
 const getApiKey = () => memoryApiKey;
@@ -79,7 +79,7 @@ async function _callGemini(prompt, selectedModel) {
   if (!apiKey) throw new Error("No API Key found. Please add one in Settings.");
 
   // Ensure model name has 'models/' prefix
-  let modelName = selectedModel || 'gemini-1.5-flash';
+  let modelName = selectedModel || 'gemini-2.5-flash';
   if (!modelName.startsWith('models/')) {
     modelName = `models/${modelName}`;
   }
