@@ -89,7 +89,17 @@ async function callBackend(funcName, args = {}) {
       clearTimeout(timeoutId);
       if (!response.ok) {
         return response.text().then(text => {
-          throw new Error(text || response.statusText);
+          let errorMsg = text || response.statusText;
+          try {
+            const parsed = JSON.parse(text);
+            if (parsed.error) errorMsg = parsed.error;
+          } catch(e) {}
+          
+          if (errorMsg.includes("429") || errorMsg.includes("quota")) {
+            throw new Error("Google has blocked your API Key because you hit the daily free limit! Please generate a brand NEW API Key from a different Google account and paste it in Settings.");
+          }
+          
+          throw new Error(errorMsg);
         });
       }
       return response.json();
