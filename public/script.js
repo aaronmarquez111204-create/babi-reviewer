@@ -307,7 +307,8 @@ function generateAIQuiz() {
     alert("Please paste more text from your PDF (at least 50 characters) to help the AI generate good questions.");
     return;
   }
-  const count = parseInt(document.getElementById('ai-count').value);
+  let count = parseInt(document.getElementById('ai-count').value) || 10;
+  if (count > 120) count = 120;
 
   const modelSelect = document.getElementById('model-select');
   const selectedModel = modelSelect ? modelSelect.value : null;
