@@ -79,7 +79,7 @@ async function _callGemini(prompt, selectedModel, expectJson = false) {
   if (!apiKey) throw new Error("No API Key found. Please add one in Settings.");
 
   // Ensure model name has 'models/' prefix
-  let modelName = selectedModel || 'gemini-2.5-flash';
+  let modelName = selectedModel || 'gemini-1.5-flash';
   if (!modelName.startsWith('models/')) {
     modelName = `models/${modelName}`;
   }
